@@ -1,4 +1,4 @@
-from alipay import AliPay
+from alipay import Alipay
 from django.shortcuts import render
 from django_redis import get_redis_connection
 
