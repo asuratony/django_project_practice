@@ -1,0 +1,6 @@
+
+# object 可以理解位 SKU的实例对象
+
+{{ object.name }}
+{{ object.caption }}
+{{ object.id }}
