@@ -38,7 +38,7 @@ var vm = new Vue({
                 this.error_pwd = false;
             }
         },
-        // 表单提交
+        // 表单提交MergeLoginView
         on_submit: function(){
             this.check_username();
             this.check_pwd();

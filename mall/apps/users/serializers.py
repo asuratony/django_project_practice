@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 # serializers.ModelSerializer
 # serializers.Serializer
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 
 from mall import settings
@@ -328,5 +330,25 @@ class SKUSerializer(serializers.ModelSerializer):
         model = SKU
         fields = ('id', 'name', 'price', 'default_image_url', 'comments')
 
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    password=serializers.CharField(label='新密码',write_only=True,max_length=20,min_length=5,required=True)
+    password2=serializers.CharField(label='确认密码',write_only=True,max_length=20,min_length=5,required=True)
+    # token = serializers.CharField(label='token', read_only=True)
 
+    class Meta:
+        model=User
+        fields=['password','password2']
+    def validate(self, attrs):
+        #1.密码,确认密码
+        password = attrs.get('password')
+        password2 = attrs.get('password2')
+        if password != password2:
+            raise serializers.ValidationError('密码不一致')
+        return attrs
 
+    def update(self, instance, validated_data):
+        """更新，instance为要更新的对象实例"""
+        print(instance.password)
+        instance.set_password(validated_data['password'])
+        instance.save()
+        return instance
