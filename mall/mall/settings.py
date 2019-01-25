@@ -38,17 +38,17 @@ CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8080',
     'localhost:8080',
     'www.meiduo.site:8080',
-
-    #新增
+    # #新增
     'api.meiduo.site:8000',
-    'www.meiduo.site',
+    'api.meiduo.site:8080',
+    # 'www.meiduo.site',
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 
 #允许哪些主机访问
 # 新增 'www.meiduo.site','192.168.229.148'
-ALLOWED_HOSTS = ['127.0.0.1','api.meiduo.site','www.meiduo.site']
+ALLOWED_HOSTS = ['127.0.0.1', 'api.meiduo.site', 'www.meiduo.site']
 
 
 # Application definition

@@ -93,5 +93,32 @@ class OrderAPIView(CreateAPIView):
     serializer_class = OrderCommitSerializer
 
 
+# GET /orders/(?P<order_id>)\d+/uncommentgoods/
+from rest_framework.generics import RetrieveAPIView
+from .serializers import CommentSkusDataSerializer, SaveCommentSerializer
+from .models import OrderGoods
 
 
+class CommentGoodsDataAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request, order_id):
+        order_id = order_id
+        order_goods = OrderGoods.objects.filter(order_id=order_id)
+        uncommentskus = []
+        for order_good in order_goods:
+            if order_good.is_commented == 0:
+                sku = order_good.sku
+                uncommentskus.append(sku)
+        serializer = CommentSkusDataSerializer(uncommentskus, many=True)
+        return Response(serializer.data)
+
+
+class SaveCommentAPIView(APIView):
+    def post(self, request, order_id):
+        req_data = request.data
+        instance = OrderGoods.objects.filter(sku_id=req_data['sku'], order_id=req_data['order']).first()
+        data = {'comment': req_data['comment'], 'score': req_data['score'], 'is_anonymous': req_data['is_anonymous'], 'is_commented': True}
+        serializer = SaveCommentSerializer(instance=instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response('OK')

@@ -42,6 +42,7 @@ GET       /verifications/imagecodes/(?P<image_code_id>.+)/
 # GeneriAPIView                 对列表视图和详情视图做了通用支持,一般和mixin配合使用
 # ListAPIView,RetrieveAPIView   连 get方法都不用写
 
+
 class RegisterImageCodeAPIView(APIView):
 
     def get(self,request,image_code_id):
@@ -127,9 +128,3 @@ class RegisterSmscodeAPIView(APIView):
         # 6.返回相应
         return Response({'msg':'ok'})
 
-        """
-        写信
-        投递到邮筒
-
-
-        """
