@@ -65,7 +65,7 @@ class PaymentAPIView(APIView):
 
 
 
-        alipay = AliPay(
+        alipay = Alipay(
             appid=settings.ALIPAY_APPID,
             app_notify_url=None,  # 默认回调url
             app_private_key_string=app_private_key_string,
@@ -115,7 +115,7 @@ class PayStatusAPIView(APIView):
         app_private_key_string = open(settings.APP_PRIVATE_KEY_PATH).read()
         alipay_public_key_string = open(settings.ALIPAY_PUBLIC_KEY_PATH).read()
 
-        alipay = AliPay(
+        alipay = Alipay(
             appid=settings.ALIPAY_APPID,
             app_notify_url=None,  # 默认回调url
             app_private_key_string=app_private_key_string,

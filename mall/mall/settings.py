@@ -262,21 +262,21 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "logs/meiduo.log"),  # 日志文件的位置
-            'maxBytes': 300 * 1024 * 1024,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
+        # 'file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.handlers.RotatingFileHandler',
+        #     'filename': os.path.join(BASE_DIR, "logs/meiduo.log"),  # 日志文件的位置
+        #     'maxBytes': 300 * 1024 * 1024,
+        #     'backupCount': 10,
+        #     'formatter': 'verbose'
+        # },
     },
-    'loggers': {
-        'django': {  # 定义了一个名为django的日志器
-            'handlers': ['console', 'file'],
-            'propagate': True,
-        },
-    }
+    # 'loggers': {
+    #     'django': {  # 定义了一个名为django的日志器
+    #         'handlers': ['console', 'file'],
+    #         'propagate': True,
+    #     },
+    # }
 }
 
 

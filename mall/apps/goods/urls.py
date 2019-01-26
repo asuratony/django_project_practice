@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^categories/(?P<category_id>\d+)/hotskus/$',views.HotSKUListAPIView.as_view(),name='hot'),
 
     url(r'^categories/(?P<category_id>\d+)/skus/$',views.SKUListAPIView.as_view(),name='hot'),
+    url(r'^orders/$',views.UserAllOrderView.as_view(),name='order'),
 
 ]
 

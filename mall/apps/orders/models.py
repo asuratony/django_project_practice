@@ -1,4 +1,5 @@
 from django.db import models
+
 from utils.models import BaseModel
 from users.models import User, Address
 from goods.models import SKU

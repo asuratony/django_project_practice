@@ -84,7 +84,7 @@ var vm = new Vue({
         },
         // 获取订单数据
         get_orders: function () {
-            axios.get(this.host+'/orders/', {
+            axios.get(this.host+'/goods/orders/', {
                     headers: {
                         'Authorization': 'JWT ' + this.token
                     },
@@ -104,7 +104,7 @@ var vm = new Vue({
                             if (name.length >= 25) {
                                 this.orders[i].skus[j].sku.name = name.substring(0, 25) + '...';
                             }
-                            this.orders[i].skus[j].amount = (parseFloat(order.skus[j].price) * order.skus[j].count).toFixed(2);
+                            this.orders[i].skus[j].amount = (parseFloat(order.skus[j].sku.price) * order.skus[j].count).toFixed(2);
                             this.orders[i].status_name = this.ORDER_STATUS_ENUM[order.status];
                             this.orders[i].pay_method_name = this.PAY_METHOD_ENUM[order.pay_method];
                         }
