@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^usernames/(?P<username>\w{5,20})/count/$',views.RegisterUsernameAPIView.as_view(),name='usernamecount'),
 
     url(r'^$',views.RegisterUserAPIView.as_view()),
-
+    url(r'^(?P<user_id>\d+)/password/$',views.Changepassword.as_view()),
 
     # 添加JWT认证
     # url(r'^auths/',obtain_jwt_token),

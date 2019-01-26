@@ -471,3 +471,27 @@ class MergeLoginView(ObtainJSONWebToken):
         return response
 
 
+
+
+class Changepassword(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+
+    def put(self, request, user_id):
+        user = request.user
+        data = request.data
+        old_password = data.get('old_password')
+        password = data.get('password')
+        password2 = data.get('password2')
+
+        if not all([old_password,password,password2]):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if user.check_password(old_password):
+            user.set_password(password)
+            user.save()
+
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+

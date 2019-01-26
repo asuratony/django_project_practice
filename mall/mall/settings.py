@@ -79,7 +79,7 @@ INSTALLED_APPS = [
     'haystack',
     'orders.apps.OrdersConfig',
     'pay.apps.PayConfig',
-    'xadmin',
+    # 'xadmin',
     'crispy_forms',
     'reversion',
 ]
@@ -358,7 +358,7 @@ DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.MyStorage'
 
 
 # FastDFS
-FDFS_URL = 'http://192.168.75.131:8888/'  # 访问图片的路径域名 ip地址修改为自己机器的ip地址
+FDFS_URL = 'http://192.168.232.131:8888/'  # 访问图片的路径域名 ip地址修改为自己机器的ip地址
 FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
 
 
@@ -371,7 +371,7 @@ GENERATED_STATIC_HTML_FILES_DIR = os.path.join(os.path.dirname(BASE_DIR), 'front
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://192.168.75.131:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
+        'URL': 'http://192.168.232.131:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
         'INDEX_NAME': 'meiduo',  # 指定elasticsearch建立的索引库的名称
     },
 }
