@@ -3,7 +3,6 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from goods.serializers import HotSKUListSerialzier, UserAllOrderSerializer
 from orders.models import OrderInfo
 
@@ -43,6 +42,9 @@ from orders.models import OrderInfo
 当用户访问的时候,我们让用户访问指定的文件就可以了
 
 """
+from goods.serializers import HotSKUListSerialzier, SKUCommentsListSerialzier
+from orders.models import OrderGoods, OrderInfo
+from users.models import User
 
 """
 
@@ -149,3 +151,17 @@ class UserAllOrderView(ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return OrderInfo.objects.filter(user_id=user.id)
+
+
+class SKUCommentsAPIView(APIView):
+    def get(self, request, sku_id):
+        commented_goods = OrderGoods.objects.filter(sku_id=sku_id).all()
+        # serializer = SKUCommentsListSerialzier(commented_goods, many=True)
+        data = []
+        for commented_good in commented_goods:
+            order_info = OrderInfo.objects.get(order_id=commented_good.order_id)
+            username = User.objects.get(id=order_info.user_id).username
+            comment = {'username': username, 'comment': commented_good.comment, 'score': commented_good.score, 'is_anonymous': commented_good.is_anonymous}
+            data.append(comment)
+
+        return Response(data)

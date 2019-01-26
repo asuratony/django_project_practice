@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from goods.models import SKU
-from orders.serializers import PlaceOrderSerializer, PlaceSerializer
+from orders.serializers import PlaceOrderSerializer, PlaceSerializer, OrderGoodsSerializer
 
 """
 当用户点击结算的时候 必须要登陆
@@ -93,5 +93,37 @@ class OrderAPIView(CreateAPIView):
     serializer_class = OrderCommitSerializer
 
 
+# GET /orders/(?P<order_id>)\d+/uncommentgoods/
+from rest_framework.generics import RetrieveAPIView
+from .serializers import CommentSkusDataSerializer, SaveCommentSerializer
+from .models import OrderGoods
 
 
+class CommentGoodsDataAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request, order_id):
+        order_id = order_id
+        order_goods = OrderGoods.objects.filter(order_id=order_id).all()
+        serializer = OrderGoodsSerializer(order_goods,many=True)
+        # uncommentskus = []
+        # for order_good in order_goods:
+        #     if order_good.is_commented == 0:
+        #         sku = order_good.sku
+        #         uncommentskus.append(sku)
+        # serializer = CommentSkusDataSerializer(uncommentskus, many=True)
+        return Response(serializer.data)
+    # [{'price': jiage, 'sku': {'name':}}]
+
+
+class SaveCommentAPIView(APIView):
+    def post(self, request, order_id):
+        req_data = request.data
+        instance = OrderGoods.objects.filter(sku_id=req_data['sku'], order_id=req_data['order']).first()
+        data = {'comment': req_data['comment'], 'score': req_data['score'], 'is_anonymous': req_data['is_anonymous'], 'is_commented': True}
+        serializer = SaveCommentSerializer(instance=instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        sku = SKU.objects.get(id=req_data['sku'])
+        sku.comments += 1
+        sku.save()
+        return Response('OK')

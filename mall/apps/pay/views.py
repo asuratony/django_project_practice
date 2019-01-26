@@ -1,4 +1,4 @@
-from alipay import Alipay
+from alipay import AliPay
 from django.shortcuts import render
 from django_redis import get_redis_connection
 
@@ -65,7 +65,7 @@ class PaymentAPIView(APIView):
 
 
 
-        alipay = Alipay(
+        alipay = AliPay(
             appid=settings.ALIPAY_APPID,
             app_notify_url=None,  # 默认回调url
             app_private_key_string=app_private_key_string,
@@ -102,8 +102,8 @@ PUT  pay/status/?key=value&xxxxx
 
 """
 
-class PayStatusAPIView(APIView):
 
+class PayStatusAPIView(APIView):
 
     def put(self,request):
         #1. 获取参数
@@ -115,7 +115,7 @@ class PayStatusAPIView(APIView):
         app_private_key_string = open(settings.APP_PRIVATE_KEY_PATH).read()
         alipay_public_key_string = open(settings.ALIPAY_PUBLIC_KEY_PATH).read()
 
-        alipay = Alipay(
+        alipay = AliPay(
             appid=settings.ALIPAY_APPID,
             app_notify_url=None,  # 默认回调url
             app_private_key_string=app_private_key_string,

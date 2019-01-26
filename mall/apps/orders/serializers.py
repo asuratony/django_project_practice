@@ -224,12 +224,33 @@ class OrderCommitSerializer(serializers.ModelSerializer):
 
             order.save()
 
-
             # 如果没有问题,则提交
             transaction.savepoint_commit(save_point)
-        #
-        #
         # 3. 订单和商品列表生成了之后,需要将 redis中选中商品删除
 
-
         return order
+from .models import OrderGoods
+
+
+class CommentSkusDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SKU
+        fields = '__all__'
+
+
+class OrderGoodsSerializer(serializers.ModelSerializer):
+
+    sku = CommentSkusDataSerializer()
+
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
+
+
+class SaveCommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OrderGoods
+        fields = ('comment', 'score', 'is_anonymous', 'is_commented')
+

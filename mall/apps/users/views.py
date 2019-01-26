@@ -59,15 +59,6 @@ class RegisterUsernameAPIView(APIView):
                          'username':username})
 
 """
-1.  明确需求 (要知道我们要干什么)
-2.  梳理思路
-3. 确定请求方式和路由
-4. 确定视图
-5. 按照步骤进行开发
-"""
-
-
-"""
 
 当用户点击注册的时候 需要将 用户名,密码,确认密码,手机号,短信验证码,是否同意协议
 发送给后端
@@ -85,9 +76,10 @@ from rest_framework.mixins import CreateModelMixin
 # GeneriAPIView                 对列表视图和详情视图做了通用支持,一般和mixin配合使用
 # CreateAPIView                  连 get方法都不用写
 
+
 class RegisterUserAPIView(APIView):
 
-    def post(self,request):
+    def post(self, request):
         # 1. 接收数据
         data = request.data
         # 2. 校验数据
@@ -99,7 +91,6 @@ class RegisterUserAPIView(APIView):
         # serializer.data 序列化操作(将模型转换位字典/JSON)
         # 原理:  序列化器根据序列化器的字段来获取模型中数据
         # 如果 序列化器中的字段位 write_only 则不会对该字段进行序列化操作
-
 
         return Response(serializer.data)
 
@@ -133,12 +124,6 @@ class RegisterUserAPIView(APIView):
 
 
 """
-
-1.  明确需求 (要知道我们要干什么)
-2.  梳理思路
-3. 确定请求方式和路由
-4. 确定视图
-5. 按照步骤进行开发
 
 个人中心
 

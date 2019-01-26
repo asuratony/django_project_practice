@@ -49,3 +49,9 @@ class UserAllOrderSerializer(serializers.ModelSerializer):
         model = OrderInfo
         fields = ('skus', 'order_id', 'create_time',
                   'total_count', 'total_amount', 'pay_method', 'status', 'freight')
+
+# 评论列表序列化器
+class SKUCommentsListSerialzier(serializers.ModelSerializer):
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
