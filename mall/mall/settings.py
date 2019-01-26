@@ -94,7 +94,7 @@ CRONJOBS = [
     # 参数2: 任务(函数/方法)
 
     # 参数3: 日志路径 ,必须正确
-    ('*/1 * * * *', 'contents.crons.generate_static_index_html', '>> /home/python/Desktop//django_project_practice/mall/logs/crontab.log')
+    ('*/1 * * * *', 'contents.crons.generate_static_index_html', '>> /home/python/Desktop/django_project_practice/mall/logs/crontab.log')
 ]
 
 MIDDLEWARE = [
@@ -140,9 +140,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '127.0.0.1',  # 数据库主机
         'PORT': 3306,  # 数据库端口
-        'USER': 'root',  # 数据库用户名
-        'PASSWORD': 'mysql',  # 数据库用户密码
-        'NAME': 'meiduo_mall_35'  # 数据库名字
+        'USER': 'meiduo',  # 数据库用户名
+        'PASSWORD': 'meiduo',  # 数据库用户密码
+        'NAME': 'meiduo_mall'  # 数据库名字
     }
 }
     # 'slave': {
@@ -262,21 +262,21 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "logs/meiduo.log"),  # 日志文件的位置
-            'maxBytes': 300 * 1024 * 1024,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
+        # 'file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.handlers.RotatingFileHandler',
+        #     'filename': os.path.join(BASE_DIR, "logs/meiduo.log"),  # 日志文件的位置
+        #     'maxBytes': 300 * 1024 * 1024,
+        #     'backupCount': 10,
+        #     'formatter': 'verbose'
+        # },
     },
-    'loggers': {
-        'django': {  # 定义了一个名为django的日志器
-            'handlers': ['console', 'file'],
-            'propagate': True,
-        },
-    }
+    # 'loggers': {
+    #     'django': {  # 定义了一个名为django的日志器
+    #         'handlers': ['console', 'file'],
+    #         'propagate': True,
+    #     },
+    # }
 }
 
 
@@ -358,7 +358,7 @@ DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.MyStorage'
 
 
 # FastDFS
-FDFS_URL = 'http://192.168.75.131:8888/'  # 访问图片的路径域名 ip地址修改为自己机器的ip地址
+FDFS_URL = 'http://192.168.131.133:8888/'  # 访问图片的路径域名 ip地址修改为自己机器的ip地址
 FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
 
 
@@ -371,7 +371,7 @@ GENERATED_STATIC_HTML_FILES_DIR = os.path.join(os.path.dirname(BASE_DIR), 'front
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://192.168.75.131:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
+        'URL': 'http://192.168.131.133:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
         'INDEX_NAME': 'meiduo',  # 指定elasticsearch建立的索引库的名称
     },
 }

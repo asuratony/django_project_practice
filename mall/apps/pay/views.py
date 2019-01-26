@@ -1,4 +1,4 @@
-from alipay import AliPay
+from alipay import Alipay
 from django.shortcuts import render
 from django_redis import get_redis_connection
 
@@ -45,7 +45,7 @@ from mall import settings
 
 class PaymentAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self,request,order_id):
         # 1. 后端接收参数
@@ -55,7 +55,7 @@ class PaymentAPIView(APIView):
             # user
             # 状态
             order = OrderInfo.objects.get(order_id=order_id,
-                                          user = request.user,
+                                          user_id = 6,
                                           status=OrderInfo.ORDER_STATUS_ENUM['UNPAID'])
         except OrderInfo.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -65,7 +65,7 @@ class PaymentAPIView(APIView):
 
 
 
-        alipay = AliPay(
+        alipay = Alipay(
             appid=settings.ALIPAY_APPID,
             app_notify_url=None,  # 默认回调url
             app_private_key_string=app_private_key_string,
@@ -115,7 +115,7 @@ class PayStatusAPIView(APIView):
         app_private_key_string = open(settings.APP_PRIVATE_KEY_PATH).read()
         alipay_public_key_string = open(settings.ALIPAY_PUBLIC_KEY_PATH).read()
 
-        alipay = AliPay(
+        alipay = Alipay(
             appid=settings.ALIPAY_APPID,
             app_notify_url=None,  # 默认回调url
             app_private_key_string=app_private_key_string,

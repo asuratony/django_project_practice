@@ -1,7 +1,11 @@
 from django.shortcuts import render
 
 # Create your views here.
-from goods.serializers import HotSKUListSerialzier
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from goods.serializers import HotSKUListSerialzier, UserAllOrderSerializer
+from orders.models import OrderInfo
 
 """
 1. 尽量多的分析表(定义出表)的字段 (不要分析表和表之间的关系)
@@ -40,12 +44,6 @@ from goods.serializers import HotSKUListSerialzier
 
 """
 
-
-
-
-
-
-
 """
 
 1. 列表数据是分为热销数据 和 列表数据的
@@ -69,8 +67,9 @@ GET     /goods/categories/category_id/hotskus/
 
 from rest_framework.generics import ListAPIView
 from goods.models import SKU
-class HotSKUListAPIView(ListAPIView):
 
+
+class HotSKUListAPIView(ListAPIView):
     pagination_class = None
 
     serializer_class = HotSKUListSerialzier
@@ -92,16 +91,17 @@ class HotSKUListAPIView(ListAPIView):
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
 
-from rest_framework.pagination import LimitOffsetPagination,PageNumberPagination
-class SKUListAPIView(ListAPIView):
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 
+
+class SKUListAPIView(ListAPIView):
     serializer_class = HotSKUListSerialzier
 
     # 排序
     filter_backends = [OrderingFilter]
-    ordering_fields = ['create_time','price','sales']
+    ordering_fields = ['create_time', 'price', 'sales']
 
-    #分页
+    # 分页
     # permission_classes = LimitOffsetPagination
     # permission_classes = StandardResultsSetPagination
 
@@ -113,19 +113,39 @@ class SKUListAPIView(ListAPIView):
 from .serializers import SKUIndexSerializer
 from drf_haystack.viewsets import HaystackViewSet
 
-class SKUSearchViewSet(HaystackViewSet):
-    """
-    SKU搜索
-    """
-    index_models = [SKU]
 
+# SKU搜索
+class SKUSearchViewSet(HaystackViewSet):
+    index_models = [SKU]
     serializer_class = SKUIndexSerializer
 
 
-"""
-运营
-
-运维  工程师  后台维护工作的
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.serializers import Serializer
 
 
-"""
+# 个人中心 全部订单
+class UserAllOrderView(ListAPIView):
+    # 身份验证
+    # permission_classes = [IsAuthenticated]
+    # pagination_class = None
+
+    # def get(self, request):
+    #     # 获取用户id
+    #     user_id = request.user.id
+    #     # 从数据库查询所有包括用户id的订单
+    #     order_set = OrderInfo.objects.filter(user_id=6)
+    #     serializer = UserAllOrderSerializer(instance=order_set, many=True)
+    #     # 遍历获取订单数量
+    #     count = 0
+    #     for i in order_set:
+    #         count += 1
+    #     return Response(serializer.data)
+    serializer_class = UserAllOrderSerializer
+
+    # permission_classes = [IsAuthenticated]
+    # pagination_class = None
+
+    def get_queryset(self):
+        user = self.request.user
+        return OrderInfo.objects.filter(user_id=user.id)
