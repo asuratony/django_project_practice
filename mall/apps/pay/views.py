@@ -45,7 +45,7 @@ from mall import settings
 
 class PaymentAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self,request,order_id):
         # 1. 后端接收参数
@@ -55,7 +55,7 @@ class PaymentAPIView(APIView):
             # user
             # 状态
             order = OrderInfo.objects.get(order_id=order_id,
-                                          user = request.user,
+                                          user_id = 6,
                                           status=OrderInfo.ORDER_STATUS_ENUM['UNPAID'])
         except OrderInfo.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)

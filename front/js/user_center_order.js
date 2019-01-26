@@ -119,7 +119,7 @@ var vm = new Vue({
             var order = this.orders[index];
             // 去支付
             if (order.status===1) {
-                axios.get(this.host+'/orders/'+order.order_id+'/payment/', {
+                axios.get(this.host+'/pay/orders/'+order.order_id, {
                         headers: {
                             'Authorization': 'JWT ' + this.token
                         },
