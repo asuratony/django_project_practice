@@ -5,9 +5,161 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from QQLoginTool.QQtool import OAuthQQ
 from mall import settings
-from oauth.models import OAuthQQUser
-from oauth.serializers import OauthQQUserSerializer
-from oauth.utils import generic_open_id
+from oauth.models import OAuthQQUser, OAuthSinaUser
+from oauth.serializers import OauthQQUserSerializer, OauthSinaUserSerializer
+from oauth.utils import generic_open_id, OAuthSina, generic_access_token
+
+"""
+    sina 视图  模仿QQ登录  
+    需求 第三方微博登录并绑定美多商城账户
+    思路 
+    请求方式和路由    返回url get     验证code并返回access_token  post  
+    视图  APIView
+  
+"""
+
+
+class OAuthSinaURLAPIView(APIView):
+
+    def get(self,request):
+
+        # auth_url = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101474184&redirect_uri=http://www.meiduo.site:8080/oauth_callback.html&state=test'
+
+        #????
+        state='/'
+
+        oauth = OAuthSina(client_id=settings.Sina_CLIENT_ID,
+                        # client_secret=settings.QQ_CLIENT_SECRET,
+                        redirect_uri=settings.Sina_REDIRECT_URI,
+                        state=state
+                          )
+
+        auth_url = oauth.get_sina_url()
+
+        return Response({'auth_url':auth_url})
+
+
+
+"""
+
+1. 当用户同意登陆的时候 ,会返回code
+2. 用code换取 token
+"""
+
+"""
+当用户同意登陆的时候,会生成code,前端需要将获取的code提交给后端
+
+GET    /oauth/qq/users/?code=xxxxx
+"""
+from rest_framework import status
+class OauthSinaUserAPIView(APIView):
+
+
+    def get(self,request):
+        #1.接收code
+        code = request.query_params.get('code')
+        if code is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        #2. 用code换取 token
+
+        oauth = OAuthSina(client_id=settings.Sina_CLIENT_ID,
+                        client_secret=settings.Sina_CLIENT_SECRET,
+                        redirect_uri=settings.Sina_REDIRECT_URI)
+
+        access_token = oauth.get_access_token(code)
+
+
+
+        #openid是此网站上唯一对应用户身份的标识，
+        # 网站可将此ID进行存储便于用户下次登录时辨识其身份
+
+        # 我们获取到openid之后,要根据这个openid去数据库中进行查询
+        # 如果数据库中有此信息,说明用户绑定过,应该让用户登陆
+        # 如果数据库中没有此信息,说明用户没有绑定过,应该让用户绑定
+        try:
+            sinauser = OAuthSinaUser.objects.get(access_token=access_token)
+        except OAuthSinaUser.DoesNotExist:
+            #说明用户没有绑定过
+
+            # 1. openid 比较敏感我们需要对openid进行处理
+            # 2. 想对绑定设置一个时效
+
+            token = generic_access_token(access_token)
+
+        # TODO  此处响应的键值对应关系
+            return Response({'access_token':token})
+
+        else:
+            # 说明用户绑定过
+            #绑定过就应该登陆
+
+            from rest_framework_jwt.settings import api_settings
+
+            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+            payload = jwt_payload_handler(sinauser.user)
+            token = jwt_encode_handler(payload)
+
+            return Response({
+                'token':token,
+                'username':sinauser.user.username,
+                'user_id':sinauser.user.id
+            })
+
+            pass
+        # finally:
+
+    """
+    当用户绑定的时候,需要让前端传递  手机号,密码,短信验证码和 加密的openid
+
+    # 1.接收数据
+    # 2.验证数据
+    #     1.openid
+    #     2.短信验证码
+    #     3.根据手机号进行判断,判断手机号是否注册过
+    # 3.数据入库
+    # 4.返回相应
+
+    POST
+
+    """
+    def post(self,request):
+        # 1.接收数据
+        data = request.data
+        # 2.验证数据
+        serializer = OauthSinaUserSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        # 3.数据入库
+        sinauser = serializer.save()
+        # 4.返回相应
+
+        from rest_framework_jwt.settings import api_settings
+
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        payload = jwt_payload_handler(sinauser.user)
+        token = jwt_encode_handler(payload)
+
+        return Response({
+            'token': token,
+            'username': sinauser.user.username,
+            'user_id': sinauser.user.id
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 """
 1.  明确需求 (要知道我们要干什么)

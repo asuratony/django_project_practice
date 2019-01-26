@@ -38,7 +38,7 @@ var vm = new Vue({
                 this.error_pwd = false;
             }
         },
-        // 表单提交MergeLoginView
+        // 表单提交
         on_submit: function(){
             this.check_username();
             this.check_pwd();
@@ -85,6 +85,20 @@ var vm = new Vue({
         qq_login: function(){
             var state = this.get_query_string('next') || '/';
             axios.get(this.host + '/oauth/qq/statues/?state=' + state, {
+                    responseType: 'json',
+                withCredentials: true
+                })
+                .then(response => {
+                    location.href = response.data.auth_url;
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                })
+        },
+        // sina登录
+        sina_login: function(){
+            var state = this.get_query_string('next') || '/';
+            axios.get(this.host + '/oauth/sina/statues/?state=' + state, {
                     responseType: 'json',
                 withCredentials: true
                 })

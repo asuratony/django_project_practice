@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from goods.models import SKU
 from orders.models import OrderInfo, OrderGoods
+from users.models import User
 
 
 class HotSKUListSerialzier(serializers.ModelSerializer):
@@ -50,8 +51,16 @@ class UserAllOrderSerializer(serializers.ModelSerializer):
         fields = ('skus', 'order_id', 'create_time',
                   'total_count', 'total_amount', 'pay_method', 'status', 'freight')
 
+
 # 评论列表序列化器
-class SKUCommentsListSerialzier(serializers.ModelSerializer):
+class SKUCommentsListSerialzer(serializers.ModelSerializer):
+
     class Meta:
         model = OrderGoods
+        fields = '__all__'
+
+
+class UserListSerialzer(serializers.ModelSerializer):
+    class Meta:
+        model = User
         fields = '__all__'
