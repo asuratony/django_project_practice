@@ -1,3 +1,5 @@
+import random
+
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import exception_handler, APIView
@@ -8,8 +10,9 @@ from rest_framework.views import exception_handler, APIView
 from goods.models import SKU
 from users.models import User
 from users.serializers import RegisterUserSerializer, UserCenterInfoSerializer, UserEmailSerializer, AddressSerializer, \
-    AddUserBrowsingHistorySerializer, SKUSerializer
-from users.utils import check_token
+    AddUserBrowsingHistorySerializer, SKUSerializer, ResetPasswordSerializer
+from users.utils import check_token, encode_token
+from verifications.serializers import RegisterSmscodeSerializer
 
 """
 1.  明确需求 (要知道我们要干什么)
@@ -456,8 +459,6 @@ class MergeLoginView(ObtainJSONWebToken):
         return response
 
 
-
-
 class Changepassword(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -480,3 +481,70 @@ class Changepassword(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+"""
+忘记密码
+第一步　手机号或用户名
+"""
+class FindPassAPIView(APIView):
+    def get(self,request,username):
+        data = request.query_params
+        text = data['text']
+        redis_conn = get_redis_connection('code')
+        image_code_id = data['image_code_id']
+        redis_text = redis_conn.get('img_' + str(image_code_id))
+
+        if redis_text is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if redis_text.decode().lower() != text.lower():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        data={}
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        data['mobile'] = user.mobile[0:3]+'****'+user.mobile[7:11]
+        token = encode_token(user.id)
+        data['access_token'] = token
+        return Response(data=data)
+# 生成短信
+class SmsAPIView(APIView):
+    def get(self,request,):
+        data = request.query_params
+        access_token =data['access_token']
+        user_id = check_token(access_token)
+        mobile = User.objects.get(id=user_id).mobile
+        sms_code = '%06d' % random.randint(0, 999999)
+        redis_conn = get_redis_connection('code')
+        redis_conn.setex('sms_' + mobile, 5 * 60, sms_code)
+        from celery_tasks.sms.tasks import send_sms_code
+        send_sms_code.delay(mobile, sms_code)
+
+        return Response({'msg': 'ok'})
+#　校验验证码
+class FindPassSmsAPIView(APIView):
+    def get(self,request,username):
+        data = request.query_params
+        text = data['sms_code']
+        user = User.objects.get(username=username)
+        mobile = user.mobile
+        redis_conn = get_redis_connection('code')
+        redis_text = redis_conn.get('sms_' + mobile)
+        if redis_text is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if redis_text.decode() != text:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        token = encode_token(user.id)
+        data={
+            'user_id':user.id,
+            'access_token':token
+        }
+        return Response(data=data)
+# 重置密码
+class ResetPasswordAPIView(APIView):
+    def post(self,request,user_id):
+        data = request.data
+        user = User.objects.get(id=user_id)
+        serializer = ResetPasswordSerializer(data=data,instance=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'msg': 'ok'},status=status.HTTP_200_OK)
