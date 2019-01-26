@@ -540,4 +540,4 @@ class ResetPasswordAPIView(APIView):
         serializer = ResetPasswordSerializer(data=data,instance=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return Response({'msg': 'ok'},status=status.HTTP_200_OK)

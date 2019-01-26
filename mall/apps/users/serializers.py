@@ -348,7 +348,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """更新，instance为要更新的对象实例"""
-        print(instance.password)
+        # print(instance.password)
         instance.set_password(validated_data['password'])
         instance.save()
         return instance
