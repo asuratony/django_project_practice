@@ -121,4 +121,7 @@ class SaveCommentAPIView(APIView):
         serializer = SaveCommentSerializer(instance=instance, data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        sku = SKU.objects.get(id=req_data['sku'])
+        sku.comments += 1
+        sku.save()
         return Response('OK')

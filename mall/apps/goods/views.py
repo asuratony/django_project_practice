@@ -1,50 +1,12 @@
 from django.shortcuts import render
 
 # Create your views here.
-from goods.serializers import HotSKUListSerialzier
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-"""
-1. 尽量多的分析表(定义出表)的字段 (不要分析表和表之间的关系)
-
-2.找一个安静的 没有人打扰的 地方  分析表和表之间的关系(只分析2个表之间的关系)
-
-
-供应商和商品
-
-
-商品id        商品的名字
-1               iphone
-2               huawei
-
-供应商id      供应商名字
-1               富士康
-2               富土康
-
-
-商品id        供应商id
-1               1
-2               1
-2               2
-1               2
-
-
-"""
-
-"""
-静态化技术  (提升用户体验, SEO)
-
-我们是通过先查询数据,将查询的数据渲染到模板中,模板就
-生成了一个html, 这个时候我们将html写入到指定的文件
-
-当用户访问的时候,我们让用户访问指定的文件就可以了
-
-"""
-
-
-
-
-
-
+from goods.serializers import HotSKUListSerialzier, SKUCommentsListSerialzier
+from orders.models import OrderGoods, OrderInfo
+from users.models import User
 
 """
 
@@ -113,6 +75,7 @@ class SKUListAPIView(ListAPIView):
 from .serializers import SKUIndexSerializer
 from drf_haystack.viewsets import HaystackViewSet
 
+
 class SKUSearchViewSet(HaystackViewSet):
     """
     SKU搜索
@@ -122,10 +85,15 @@ class SKUSearchViewSet(HaystackViewSet):
     serializer_class = SKUIndexSerializer
 
 
-"""
-运营
+class SKUCommentsAPIView(APIView):
+    def get(self, request, sku_id):
+        commented_goods = OrderGoods.objects.filter(sku_id=sku_id).all()
+        # serializer = SKUCommentsListSerialzier(commented_goods, many=True)
+        data = []
+        for commented_good in commented_goods:
+            order_info = OrderInfo.objects.get(order_id=commented_good.order_id)
+            username = User.objects.get(id=order_info.user_id).username
+            comment = {'username': username, 'comment': commented_good.comment, 'score': commented_good.score, 'is_anonymous': commented_good.is_anonymous}
+            data.append(comment)
 
-运维  工程师  后台维护工作的
-
-
-"""
+        return Response(data)

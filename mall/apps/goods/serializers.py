@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from goods.models import SKU
+from orders.models import OrderGoods
 
 
 class HotSKUListSerialzier(serializers.ModelSerializer):
@@ -17,3 +18,9 @@ class SKUIndexSerializer(HaystackSerializer):
     class Meta:
         index_classes = [SKUIndex]
         fields = ('text', 'id', 'name', 'price', 'default_image_url', 'comments')
+
+
+class SKUCommentsListSerialzier(serializers.ModelSerializer):
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
